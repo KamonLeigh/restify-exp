@@ -62,7 +62,9 @@ userSchema.statics.findByCredentials = async (email, password) {
     return user
 }
 
-userSchema.pre('save', async (next) => {
+userSchema.methods.generate 
+
+userSchema.pre('save', async function(next) {
   const user = this;
 
   if (user.isModified('password')) {
