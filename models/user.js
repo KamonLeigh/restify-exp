@@ -1,6 +1,8 @@
+/* eslint-disable func-names */
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
   forename: {
@@ -47,24 +49,40 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-userSchema.statics.findByCredentials = async (email, password) {
-    const user = await User.findOne({ email });
+const User = mongoose.model('User', userSchema);
 
-    if (!user) {
-        throw new Error('Unable to login');
-    }
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
 
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
+  delete userObject.password;
+  delete userObject.tokens;
 
-    if (!isPasswordMatched) {
-        throw new Error('Unable to login');
-    }
-    return user
-}
+  return userObject;
+};
 
-userSchema.methods.generate 
+userSchema.statics.findByCredentials = async function (email, password) {
+  const user = await User.findOne({ email });
 
-userSchema.pre('save', async function(next) {
+  if (!user) {
+    throw new Error('Unable to login');
+  }
+
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordMatched) {
+    throw new Error('Unable to login');
+  }
+  return user;
+};
+
+userSchema.methods.generate = async function () {
+  const user = this;
+  const token = await jwt.sign({ _id: user.id }, 'thisiasecret');
+
+  user.token = await user.token.concat(token);
+};
+
+userSchema.pre('save', async function (next) {
   const user = this;
 
   if (user.isModified('password')) {
@@ -73,7 +91,5 @@ userSchema.pre('save', async function(next) {
 
   next();
 });
-
-const User = mongoose.model('User', userSchema);
 
 module.exports = User;
