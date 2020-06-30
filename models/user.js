@@ -75,11 +75,14 @@ userSchema.statics.findByCredentials = async function (email, password) {
   return user;
 };
 
-userSchema.methods.generate = async function () {
+userSchema.methods.generateToken = async function () {
   const user = this;
   const token = await jwt.sign({ _id: user.id }, 'thisiasecret');
 
   user.token = await user.token.concat(token);
+  await user.save();
+
+  return token;
 };
 
 userSchema.pre('save', async function (next) {
