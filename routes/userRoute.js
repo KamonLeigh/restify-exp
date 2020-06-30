@@ -1,3 +1,4 @@
+// const errors = require('re')
 const User = require('../models/user');
 
 function userRouter(server) {
@@ -10,7 +11,7 @@ function userRouter(server) {
 
       res.send(201, { user, token });
     } catch (error) {
-      res.status(400).send(error);
+      res.send(400, error);
     }
   });
 }
