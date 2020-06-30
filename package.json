@@ -8,9 +8,12 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.20",
     "restify": "^8.5.1",
-    "restify-errors": "^8.0.2"
+    "restify-errors": "^8.0.2",
+    "validator": "^13.1.1"
   },
   "devDependencies": {
     "eslint": "^7.3.1",
