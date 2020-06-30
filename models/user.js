@@ -19,24 +19,26 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
+    unique: true,
   },
   password: {
     type: String,
     required: true,
+    lowercase: true,
     minlength: 6,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
     validate(value) {
       if (!validator.isEmail(value)) {
         throw new Error('email is invalid');
       }
 
-      if (!validator.isLength(value, { min: 6, max: undefined })) {
-        throw new Error('password length must be greater than six');
-      }
+    //   if (!validator.isLength(value, { min: 6, max: undefined })) {
+    //     throw new Error('password length must be greater than six');
+    //   }
     },
   },
   tokens: [
@@ -49,8 +51,6 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-const User = mongoose.model('User', userSchema);
-
 userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
 
@@ -61,6 +61,7 @@ userSchema.methods.toJSON = function () {
 };
 
 userSchema.statics.findByCredentials = async function (email, password) {
+  // eslint-disable-next-line no-use-before-define
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -77,9 +78,9 @@ userSchema.statics.findByCredentials = async function (email, password) {
 
 userSchema.methods.generateToken = async function () {
   const user = this;
-  const token = await jwt.sign({ _id: user.id }, 'thisiasecret');
+  const token = jwt.sign({ _id: user.id.toString() }, 'thisiasecret');
 
-  user.token = await user.token.concat(token);
+  user.tokens = await user.tokens.concat({ token });
   await user.save();
 
   return token;
@@ -94,5 +95,6 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;

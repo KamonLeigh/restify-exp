@@ -10,12 +10,6 @@ mongoose.connect('mongodb://localhost:27017/task-api', {
   useUnifiedTopology: true,
 });
 
-// const db = mongoose.connection;
-
-// db.once('open', () => {
-//  console.log("connect to database");
-// });
-
 server.pre((req, res, next) => {
   console.log(`${req.method}-${req.url}`);
   next();
