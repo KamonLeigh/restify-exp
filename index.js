@@ -25,6 +25,7 @@ server.use(restify.plugins.bodyParser());
 server.use(restify.plugins.queryParser());
 
 require('./routes/test')(server);
+require('./routes/userRoute')(server);
 
 server.listen(8090, () => {
   console.info('app running on port');
