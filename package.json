@@ -11,6 +11,7 @@
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.20",
+    "mongoose-timestamp": "^0.6.0",
     "restify": "^8.5.1",
     "restify-errors": "^8.0.2",
     "validator": "^13.1.1"

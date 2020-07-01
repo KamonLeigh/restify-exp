@@ -14,6 +14,20 @@ function userRouter(server) {
       return next(new errors.BadRequestError(error));
     }
   });
+  server.post('/users/signin', async (req, res, next) => {
+    if (!req.is('application/json')) {
+      return next(new errors.InvalidContentError("This API expects: 'application/json'"));
+    }
+
+    try {
+      const user = await User.findByCredentials(req.body.email, req.body.password);
+      const token = await user.generateToken();
+      res.send(200, { user, token });
+      return next();
+    } catch (error) {
+      return next(new errors.BadRequestError(error));
+    }
+  });
 }
 
 module.exports = userRouter;

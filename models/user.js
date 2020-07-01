@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const timestamp = require('mongoose-timestamp');
 
 const userSchema = new mongoose.Schema({
   forename: {
@@ -51,6 +52,8 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+userSchema.plugin(timestamp);
+
 userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
 
@@ -65,11 +68,13 @@ userSchema.statics.findByCredentials = async function (email, password) {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new Error('Unable to login');
+    throw new Error('Unable to login ');
   }
 
-  const isPasswordMatched = await bcrypt.compare(password, user.password);
+  console.log(password, user.password);
 
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
+  console.log(isPasswordMatched);
   if (!isPasswordMatched) {
     throw new Error('Unable to login');
   }
