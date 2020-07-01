@@ -15,6 +15,7 @@ server.pre((req, res, next) => {
   next();
 });
 
+server.pre(restify.plugins.pre.dedupeSlashes());
 server.use(restify.plugins.bodyParser());
 server.use(restify.plugins.queryParser());
 
