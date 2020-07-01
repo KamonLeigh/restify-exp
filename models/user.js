@@ -25,7 +25,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    lowercase: true,
     minlength: 6,
   },
   email: {
@@ -63,24 +62,6 @@ userSchema.methods.toJSON = function () {
   return userObject;
 };
 
-userSchema.statics.findByCredentials = async function (email, password) {
-  // eslint-disable-next-line no-use-before-define
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    throw new Error('Unable to login ');
-  }
-
-  console.log(password, user.password);
-
-  const isPasswordMatched = await bcrypt.compare(password, user.password);
-  console.log(isPasswordMatched);
-  if (!isPasswordMatched) {
-    throw new Error('Unable to login');
-  }
-  return user;
-};
-
 userSchema.methods.generateToken = async function () {
   const user = this;
   const token = jwt.sign({ _id: user.id.toString() }, 'thisiasecret');
@@ -91,10 +72,27 @@ userSchema.methods.generateToken = async function () {
   return token;
 };
 
+userSchema.statics.findByCredentials = async function (email, password) {
+  // eslint-disable-next-line no-use-before-define
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error('Unable to login');
+  }
+
+  const isMatched = await bcrypt.compare(password, user.password);
+
+  if (!isMatched) {
+    throw new Error('Unable to login');
+  }
+
+  return user;
+};
+
 userSchema.pre('save', async function (next) {
   const user = this;
 
-  if (user.isModified('password')) {
+  if (user.isModified('password') || user.isNew) {
     user.password = await bcrypt.hash(user.password, 8);
   }
 
