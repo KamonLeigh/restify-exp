@@ -1,8 +1,13 @@
 const errors = require('restify-errors');
 const User = require('../models/user');
+const { auth } = require('../middleware');
 
 function userRouter(server) {
   server.post('/users', async (req, res, next) => {
+    if (!req.is('application/json')) {
+      return next(new errors.InvalidContentError("This API expects: 'application/json'"));
+    }
+
     const user = new User(req.body);
 
     try {
@@ -26,6 +31,33 @@ function userRouter(server) {
       return next();
     } catch (error) {
       return next(new errors.BadRequestError(error));
+    }
+  });
+
+  server.get('/users/me', auth, (req, res, next) => {
+    res.send(200, req.user);
+    return next();
+  });
+
+  server.post('/users/signout', auth, async (req, res, next) => {
+    try {
+      req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token);
+      await req.user.save();
+      res.send();
+      return next();
+    } catch (error) {
+      return next(new error.InternalServerError());
+    }
+  });
+
+  server.post('/user/signout/all', auth, async (req, res, next) => {
+    try {
+      req.user.tokens = [];
+      await req.user.save();
+      res.send();
+      return next();
+    } catch (error) {
+      return next(new error.InternalServerError());
     }
   });
 }
