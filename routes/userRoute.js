@@ -46,7 +46,7 @@ function userRouter(server) {
       res.send();
       return next();
     } catch (error) {
-      return next(new error.InternalServerError());
+      return next(new errors.InternalServerError());
     }
   });
 
@@ -57,7 +57,42 @@ function userRouter(server) {
       res.send();
       return next();
     } catch (error) {
-      return next(new error.InternalServerError());
+      return next(new errors.InternalServerError());
+    }
+  });
+
+  server.patch('/user/me', auth, async (req, res, next) => {
+    if (!req.is('application/json')) {
+      return next(new errors.InvalidContentError("This API expects: 'application/json'"));
+    }
+
+    const validKeys = ['forename', 'surname', 'username', 'password', 'email'];
+    const updates = Object.keys(req.body);
+
+    const isValidOperations = updates.every((key) => validKeys.includes(key));
+
+    if (!isValidOperations) {
+      return next(new errors.BadRequestError('Please provide valid operation'));
+    }
+
+    try {
+      // eslint-disable-next-line no-return-assign
+      updates.forEach((update) => req.user[update] = req.body[update]);
+      await req.user.save();
+      res.send(200, req.user);
+      return next();
+    } catch (error) {
+      return next(new errors.BadRequestError(error.stack));
+    }
+  });
+
+  server.delete('/user/me', auth, async (req, res, next) => {
+    try {
+      await req.user.remove();
+      res.send(200, req.user);
+      return next();
+    } catch (error) {
+      return next(new errors.InternalServerError(error.stack));
     }
   });
 }
