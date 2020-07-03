@@ -53,6 +53,12 @@ const userSchema = new mongoose.Schema({
 
 userSchema.plugin(timestamp);
 
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'author',
+});
+
 userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
 
