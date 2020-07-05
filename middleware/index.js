@@ -12,13 +12,13 @@ module.exports = {
       const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
 
       if (!user) {
-        return next(new errors.BadRequestError('invalid request'));
+        return next(new errors.UnauthorizedError('invalid request'));
       }
       req.token = token;
       req.user = user;
       return next();
     } catch (error) {
-      return next(new errors.BadRequestError('invalid request'));
+      return next(new errors.UnauthorizedError('please authenticate '));
     }
   },
 };
