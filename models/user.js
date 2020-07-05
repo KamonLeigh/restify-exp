@@ -83,13 +83,11 @@ userSchema.methods.generateToken = async function () {
 userSchema.statics.findByCredentials = async function (email, password) {
   // eslint-disable-next-line no-use-before-define
   const user = await User.findOne({ email });
-
   if (!user) {
     throw new Error('Unable to login');
   }
 
   const isMatched = await bcrypt.compare(password, user.password);
-
   if (!isMatched) {
     throw new Error('Unable to login');
   }

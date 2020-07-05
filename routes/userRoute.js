@@ -23,7 +23,6 @@ function userRouter(server) {
     if (!req.is('application/json')) {
       return next(new errors.InvalidContentError("This API expects: 'application/json'"));
     }
-
     try {
       const user = await User.findByCredentials(req.body.email, req.body.password);
       const token = await user.generateToken();
@@ -86,7 +85,7 @@ function userRouter(server) {
     }
   });
 
-  server.delete('/user/me', auth, async (req, res, next) => {
+  server.del('/user/me', auth, async (req, res, next) => {
     try {
       await req.user.remove();
       res.send(200, req.user);

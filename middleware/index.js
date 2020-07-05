@@ -8,7 +8,6 @@ module.exports = {
     try {
       const token = req.header('Authorization').replace('Bearer ', '');
       const decoded = jwt.verify(token, 'thisiasecret');
-
       const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
 
       if (!user) {

@@ -46,6 +46,25 @@ function taskRouter(server) {
       return next(new errors.InternalServerError(error));
     }
   });
+
+  server.post('/task', auth, async (req, res, next) => {
+    if (!req.is('application/json')) {
+      return next(new errors.InvalidContentError("This API expects: 'application/json'"));
+    }
+
+    const task = new Task({
+      ...req.body,
+      author: req.user._id,
+    });
+
+    try {
+      await task.save();
+      res.send(201, task);
+      return next();
+    } catch (error) {
+      return next(new errors.InternalServerError());
+    }
+  });
 }
 
 module.exports = taskRouter;
