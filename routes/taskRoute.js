@@ -65,6 +65,16 @@ function taskRouter(server) {
       return next(new errors.InternalServerError());
     }
   });
+
+  server.del('/task/:id', auth, async (req, res, next) => {
+    try {
+      await Task.deleteTask(req.user._id, req.params.id);
+      res.send(200);
+      return next();
+    } catch (error) {
+      return next(new errors.InternalServerError());
+    }
+  });
 }
 
 module.exports = taskRouter;
