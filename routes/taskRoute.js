@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable no-underscore-dangle */
 const errors = require('restify-errors');
 const Task = require('../models/task');
@@ -70,6 +71,32 @@ function taskRouter(server) {
     try {
       await Task.deleteTask(req.user._id, req.params.id);
       res.send(200);
+      return next();
+    } catch (error) {
+      return next(new errors.InternalServerError());
+    }
+  });
+
+  server.patch('/task/:id', auth, async (req, res, next) => {
+    if (!req.is('application/json')) {
+      return next(new errors.InvalidContentError("This API expects: 'application/json'"));
+    }
+
+    const keys = Object.keys(req.body);
+    const validKeys = ['completed', 'description', 'ratings'];
+
+    const isBodyValid = keys.every((key) => validKeys.includes(key));
+
+    if (!isBodyValid) {
+      return next(new errors.BadRequestError('Please provide valid operation'));
+    }
+
+    try {
+      const task = Task.findOne({ author: req.user._id, _id: req.params.id });
+
+      validKeys.forEach((key) => task[key] = req.body[key]);
+      await task.save();
+      res.send(200, task);
       return next();
     } catch (error) {
       return next(new errors.InternalServerError());
