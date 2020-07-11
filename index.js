@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const server = restify.createServer({ name: 'task-app' });
 
-mongoose.connect('mongodb://localhost:27017/task-api', {
+mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
@@ -30,6 +30,6 @@ require('./routes/test')(server);
 require('./routes/userRoute')(server);
 require('./routes/taskRoute')(server);
 
-server.listen(8090, () => {
+server.listen(process.env.PORT, () => {
   console.info('app running on port');
 });

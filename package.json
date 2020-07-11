@@ -5,10 +5,11 @@
   "author": "byron dunkley",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "env-cmd -f ./config/dev.env nodemon index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "env-cmd": "^10.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.20",
     "mongoose-timestamp": "^0.6.0",
