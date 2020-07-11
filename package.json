@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.22.0",
     "env-cmd": "^10.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.20",
