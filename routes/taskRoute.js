@@ -3,6 +3,7 @@
 const errors = require('restify-errors');
 const Task = require('../models/task');
 const { auth } = require('../middleware');
+const cloudinary = require('../utils/cloudinary');
 
 function taskRouter(server) {
   server.get('/tasks', auth, async (req, res, next) => {
@@ -97,6 +98,25 @@ function taskRouter(server) {
       validKeys.forEach((key) => task[key] = req.body[key]);
       await task.save();
       res.send(200, task);
+      return next();
+    } catch (error) {
+      return next(new errors.InternalServerError());
+    }
+  });
+
+  server.post('/task/upload/:id', auth, async (req, res, next) => {
+    try {
+      const file = req.body.data;
+      const uploadRes = await cloudinary.uploader.upload(file, {
+        upload_preset: process.env.CLOUDINARY_PRESET,
+      });
+
+      const task = await Task.findOne({ author: req.user._id, _id: req.params.id });
+      const image = { url: uploadRes.secure_url, public_id: uploadRes.public_id };
+      task.image = image;
+
+      task.save();
+      res.send(200);
       return next();
     } catch (error) {
       return next(new errors.InternalServerError());
