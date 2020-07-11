@@ -1,15 +1,9 @@
 /* eslint-disable no-console */
 const restify = require('restify');
 const corsMiddleware = require('restify-cors-middleware');
-const mongoose = require('mongoose');
 
 const server = restify.createServer({ name: 'task-app' });
-
-mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true,
-});
+require('./db');
 
 const cors = corsMiddleware({
   origins: ['http://localhost:8090'],
